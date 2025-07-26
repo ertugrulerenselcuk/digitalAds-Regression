@@ -1,104 +1,149 @@
-# digitalAds-Regression
-# 📈 Digital Ads & Linear Regression Project
+# 📈 Digital Ads & Sales Analysis with Excel Regression
 
-This project explores how **advertising spend** affects **sales**, using Excel-based data cleaning and linear regression modeling. Missing values, outliers, and regression coefficients are handled step-by-step to gain business insights from digital advertising data.
-
----
-
-## 📊 Dataset Overview
-
-The dataset contains:
-- `GoogleAds`, `Meta`, `Influencer` → Daily advertising spend
-- `Sales` → Corresponding daily sales
-
-We noticed **5 missing values** in the `Sales` column.
-
-📷 ![Missing Values in Sales](screenshots/digitalAds_1.png)
+This project demonstrates a full-cycle exploratory and predictive analysis on a marketing dataset using **Microsoft Excel**. It includes handling missing data, managing outliers, and building a **linear regression model** to uncover the impact of advertising budgets (Google Ads, Meta, Influencer) on sales.
 
 ---
 
-## 🧹 Handling Missing Sales Values
+## 📂 Dataset Summary
 
-### Method 1: Mean or Median Imputation?
+The dataset contains the following variables:
+- `GoogleAds`: daily budget spent on Google advertising
+- `Meta`: daily budget spent on Meta (Facebook, Instagram)
+- `Influencer`: influencer marketing spend
+- `Sales`: observed daily sales outcome
+- `ID` and `Date`: to track and sort rows
 
-📌 We consider filling missing `Sales` values using **mean** or **median** — but this ignores relationships with ad spend.
+Initially, 5 missing values are found in the `Sales` column.
 
-📷 ![Median vs Spend](screenshots/digitalAds_4.png)
+📷 ![Missing Sales Count](screenshots/digitalAds_1.png)
+📷 ![Excel COUNTA Summary](screenshots/digitalAds_2.png)
 
 ---
 
-### Method 2: Correlation-Based Imputation
+## 🧼 Handling Missing Values
 
-We compute the **correlation between ad channels and sales**:
-- `GoogleAds` shows the **strongest correlation (~0.67)**.
+### ➤ Step 1: Identifying Missing Data
+We used `COUNTA` to detect missing values in the `Sales` column.
+
+> 📌 5 missing entries found.
+
+### ➤ Step 2: Should We Fill Missing `Sales`?
+Typically in machine learning, we don't impute the **dependent variable** (here, `Sales`). But in this case, we experiment with different imputation strategies.
+
+📷 ![Mean and Median Comparison](screenshots/digitalAds_3.png)
+
+### ➤ Step 3: Median Imputation (Rejected)
+Filling missing values with `Sales` median (129) is not ideal—ad spend varies significantly across rows.
+
+📷 ![Median Rejection Example](screenshots/digitalAds_4.png)
+
+---
+
+## 📊 Correlation-Based Imputation
+
+We analyzed correlation of `Sales` with each ad channel:
+- GoogleAds: **0.67** (strongest correlation)
 
 📷 ![Correlation Check](screenshots/digitalAds_5.png)
+📷 ![Focused GoogleAds](screenshots/digitalAds_6.png)
 
-So, we sort the table by `GoogleAds`, and fill missing `Sales` using the **average of 3 rows above and below** the missing entries.
+### ➤ Step 4: Imputation with GoogleAds-based Neighbors
+We sorted by GoogleAds and for each missing `Sales`, took the **average of 3 above and 3 below** entries (in terms of GoogleAds values).
 
-📷 ![Local Mean Imputation](screenshots/digitalAds_9.png)
+📷 ![Sorted Google Ads](screenshots/digitalAds_8.png)
+📷 ![Imputation Example A](screenshots/digitalAds_9.png)
+📷 ![Imputation Example B](screenshots/digitalAds_10.png)
+📷 ![Final Imputation Results](screenshots/digitalAds_11.png)
+📷 ![Sorted Back by ID](screenshots/digitalAds_12.png)
 
----
-
-## 🔎 Detecting and Treating Outliers
-
-We use **scatter plots** to visualize outliers in `GoogleAds` vs. `Sales`.
-
-📷 ![Outlier Plot](screenshots/digitalAds_15.png)
-
-Extreme values like 100 or 290 are compressed to more moderate levels like 55 or 150.
-
-📷 ![Outlier Compression](screenshots/digitalAds_21.png)
-
-This creates a more robust dataset for regression.
+> 🧠 Example: A previous median-filled value of 129 improved to ~107 using this method.
 
 ---
 
-## 📉 Linear Regression: GoogleAds vs Sales
+## 🚨 Outlier Detection and Smoothing
 
-Using Excel's "Add Trendline" tool and Data Analysis add-in, we compute a **linear regression equation**:
+### ➤ Step 5: Scatter Plot Visualization
+We visualized GoogleAds vs. Sales to identify outliers using **scatter plots**.
 
-```math
+📷 ![Initial Scatter Plot](screenshots/digitalAds_15.png)
+
+### ➤ Step 6: Manual Capping Strategy
+We capped extreme values to reduce their influence on regression slope:
+- GoogleAds: values like 100 → 55, 70 → 20
+- Sales: values like 290 → 150
+
+📷 ![Outlier Capping GoogleAds](screenshots/digitalAds_18.png)
+📷 ![Outlier Capping Sales](screenshots/digitalAds_21.png)
+📷 ![Post-Capping Scatter Plot](screenshots/digitalAds_22.png)
+
+---
+
+## 📉 Linear Regression in Excel
+
+We used Excel’s **"Add Trendline"** and **Data Analysis Toolpak** to generate a **regression line**.
+
+### 📘 Equation of the Line:
+
+\[
 y = 2.2613x + 72.627
-```
+\]
+
 Where:
+- `x` = Google Ads spend
+- `y` = Predicted sales
 
-x = Google Ads spend
+📷 ![Regression Line Equation](screenshots/digitalAds_24.png)
+📷 ![Trendline Explanation](screenshots/digitalAds_25.png)
 
-y = Sales
+### 🧠 Interpretation:
+| Term       | Meaning                                           |
+|------------|----------------------------------------------------|
+| `x`        | Google Ads (independent variable)                 |
+| `y`        | Sales (dependent variable)                        |
+| `2.2613`   | For every 1 unit increase in ads, sales rise 2.26 |
+| `72.627`   | Even with 0 ad spend, baseline sales = 72.6       |
 
-📷
+📷 ![Equation Interpretation](screenshots/digitalAds_26.png)
+📷 ![XY Axis Mapping](screenshots/digitalAds_27.png)
+📷 ![Graph Elements Explained](screenshots/digitalAds_28.png)
+📷 ![Visual Equation Summary](screenshots/digitalAds_29.png)
 
-🔍 Interpretation
-Slope (2.26) → Every extra 1 unit spent on Google Ads brings ~2.26 units in Sales
+---
 
-Intercept (72.62) → Even with 0 spend, baseline sales = 72.62 (from loyal customers etc.)
+## 🔍 Predictive Examples
 
-💡 Predictive Examples
-| Google Ads Spend (x) | Expected Sales (y)            |
-| -------------------- | ----------------------------- |
-| 0                    | 72.62                         |
-| 10                   | 2.2613 × 10 + 72.627 = 95.24  |
-| 30                   | 2.2613 × 30 + 72.627 = 140.47 |
+| Google Ads Spend (x) | Predicted Sales (y)           |
+|----------------------|-------------------------------|
+| 0                    | 72.63                         |
+| 10                   | 95.24                         |
+| 20                   | 117.85                        |
+| 30                   | 140.47                        |
 
+---
 
-📘 Summary
+## 🧪 Tools Used
 
-| Term   | Meaning                                    | Seen On Chart?     |
-| ------ | ------------------------------------------ | ------------------ |
-| x      | Google Ads spend (Independent Variable)    | X-axis             |
-| y      | Sales (Dependent Variable)                 | Y-axis             |
-| 2.2613 | Slope – impact per unit of ad spend        | Trendline slope    |
-| 72.627 | Intercept – base sales without advertising | Not always visible |
+- Microsoft Excel
+- Excel Data Analysis Toolpak
+- Scatter Plots + Trendlines
+- Correlation Analysis
+- Manual Outlier Smoothing
 
-📷
+📷 ![Regression Tool in Excel](screenshots/digitalAds_31.png)
+📷 ![Regression Output Summary](screenshots/digitalAds_32.png)
 
-🛠 Tools Used
-Microsoft Excel
+---
+## ✅ Summary
 
-Data Analysis Toolpak
+This project reflects how **practical business analysis** is done using just Excel:
+- Exploratory data analysis
+- Visual analytics
+- Strategic imputation
+- Outlier management
+- Simple regression modeling
 
-Scatter Plot + Trendline
+A great example of lightweight yet effective marketing analytics.
 
-Correlation, Imputation, Outlier Handling
+---
 
+Feel free to ⭐ star this repo or fork it to enhance it with Python, Power BI, or Google Sheets implementations!
